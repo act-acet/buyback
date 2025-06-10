@@ -22,7 +22,7 @@
             position: relative;
         }
         
-      /*   .background-animation {
+      /* .background-animation {
             position: fixed;
             top: 0;
             left: 0;
@@ -333,18 +333,18 @@
         }
 
         .calendar-day.has-data {
-    background: none; /* No color */
-    color: #00ff88; /* Keep text color visible */
-    box-shadow: none; /* Remove glow */
-    border: 1px solid rgba(0,255,136,0.5); /* subtle border to show it has data */
-}
+            background: none; /* No color */
+            color: #00ff88; /* Keep text color visible */
+            box-shadow: none; /* Remove glow */
+            border: 1px solid rgba(0,255,136,0.5); /* subtle border to show it has data */
+        }
 
         .calendar-day.selected {
-    background: linear-gradient(45deg, #00ff88, #00ccff); /* bright background */
-    color: #000;
-    border: 2px solid #ffd700;
-    box-shadow: 0 0 12px rgba(255,215,0,0.8);
-}
+            background: linear-gradient(45deg, #00ff88, #00ccff); /* bright background */
+            color: #000;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 12px rgba(255,215,0,0.8);
+        }
 
         .calendar-day.no-data {
             background: rgba(255,255,255,0.1); 
@@ -352,7 +352,6 @@
         }
 
         .calendar-day:hover.has-data {
-		    
             transform: scale(1.15);
             box-shadow: 0 0 10px rgba(0,255,136,0.4);
         }
@@ -388,6 +387,58 @@
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(255,68,68,0.5);
         }
+
+        /* Search bar styles */
+        .search-container {
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+            animation: slideInUp 1s ease-out 0.6s both;
+            display: flex; /* Make it a flex container */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Align items vertically */
+        }
+
+        .search-container input {
+            flex-grow: 1; /* Allow input to take available space */
+            padding: 12px 20px;
+            border: 2px solid #00ff88;
+            border-radius: 25px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-right: 10px; /* Space between input and button */
+        }
+
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-container input:focus {
+            border-color: #00ccff;
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
+        }
+
+        /* New Clear Wallet Search Button Style */
+        .clear-wallet-search-btn {
+            background: linear-gradient(45deg, #00ccff, #007bff);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        .clear-wallet-search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -403,14 +454,19 @@
                     ⭐ All claims USDT from <span style="color: #ff6b35;">**Buy Back ACT Campaign**</span>
                 </div>
                 <div style="color: #ffaa00; font-size: 1.1rem; margin-top: 8px; text-shadow: 0 0 10px rgba(255,170,0,0.5);">
-                    **by ACET Founder**  *ไม่ใช่การเชิญชวนหรือแนะนำการลงทุน
+                    **by ACET Founder** *ไม่ใช่การเชิญชวนหรือแนะนำการลงทุน
                 </div>
             </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="walletSearch" placeholder="Search by Wallet Address (e.g., 0x22...7haC)">
+            <button id="clearWalletSearchBtn" class="clear-wallet-search-btn">Clear Wallet</button>
         </div>
         
         <div class="transactions-grid" id="transactionsGrid"></div>
         
-        <div class="section-title">⚠️ Claims Alert summary</div>
+        <div class="section-title">🚨 Claims Alert summary</div>
         
         <div class="stats-container">
             <div class="stat-card">
@@ -9422,8 +9478,12 @@
 { amount: 8312.01, time: '9/9/2025 20:01', address: '0xee...eea4', contact: 180, date: '9/9/2025' },
 { amount: 25730.10, time: '9/9/2025 22:04', address: '0x6c...1452', contact: 180, date: '9/9/2025' },
 { amount: 8576.84, time: '9/9/2025 22:49', address: '0x6c...1452', contact: 180, date: '9/9/2025' } ];
-        let selectedDates = ['4/6/2025']; // Array to store multiple selected dates
+        
+        const today = new Date();
+        const todayStr = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
+        let selectedDates = [todayStr]; // Initialize with today's date
         let currentTransactions = [];
+        let searchQuery = ''; 
 
         // Create advanced chart
         const ctx = document.getElementById('transactionChart').getContext('2d');
@@ -9523,8 +9583,7 @@
             <div style="margin-right: 30px;">
                 <div class="calendar-container">
                    <div class="calendar-header">
-                    <!--     📅 June 2025   -->
-						<div class="calendar-controls">📅
+                    <div class="calendar-controls">📅
   <select id="monthSelect">
     <option value="0">January</option>
     <option value="1">February</option>
@@ -9548,8 +9607,7 @@
 </div>
                     </div>
                     <div class="calendar-grid" id="calendarGrid">
-                        <!-- Calendar will be generated here -->
-                    </div>
+                        </div>
                     <div class="selected-dates-info" id="selectedDatesInfo">
                         Click dates to select multiple
                     </div>
@@ -9569,19 +9627,21 @@
             </div>
         `;
         transactionsGrid.appendChild(totalCard);
+
         function getMonthYear(dateStr) {
-    const [day, month, year] = dateStr.split('/').map(num => parseInt(num));
-    const dateObj = new Date(year, month - 1, day);
-    return dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-} 
+            const [day, month, year] = dateStr.split('/').map(num => parseInt(num));
+            const dateObj = new Date(year, month - 1, day);
+            return dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        } 
+        
         // Generate smaller calendar
         function generateCalendar() {
             const calendarGrid = document.getElementById('calendarGrid');
             calendarGrid.innerHTML = ''; // Clear existing calendar
             
             const date = new Date(currentYear, currentMonth, 1);
-const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-const startDay = date.getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const startDay = date.getDay();
             
             // Add day headers
             const dayHeaders = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -9602,7 +9662,7 @@ const startDay = date.getDay();
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayElement = document.createElement('div');
-                const dateStr = `${day}/${currentMonth+1}/${currentYear}`;;
+                const dateStr = `${day}/${currentMonth+1}/${currentYear}`;
                 const dayTransactions = transactions.filter(t => t.date === dateStr);
                 const hasTransactions = dayTransactions.length > 0;
                 const isSelected = selectedDates.includes(dateStr);
@@ -9647,9 +9707,9 @@ const startDay = date.getDay();
             
             // Sort selected dates
             selectedDates.sort((a, b) => {
-                const dayA = parseInt(a.split('/')[0]);
-                const dayB = parseInt(b.split('/')[0]);
-                return dayA - dayB;
+                const [dayA, monthA, yearA] = a.split('/').map(Number);
+                const [dayB, monthB, yearB] = b.split('/').map(Number);
+                return new Date(yearA, monthA - 1, dayA) - new Date(yearB, monthB - 1, dayB);
             });
             
             updateDisplay();
@@ -9676,41 +9736,65 @@ const startDay = date.getDay();
         
         // Function to update entire display
         function updateDisplay() {
-            // Get transactions for all selected dates
-            currentTransactions = transactions.filter(t => selectedDates.includes(t.date));
+            let filteredTransactions;
+
+            // If a search query is present, ignore calendar dates and search all transactions
+            if (searchQuery) {
+                let effectiveSearchQuery = searchQuery.toLowerCase().replace(/\s/g, '');
+
+                if (effectiveSearchQuery.length > 10 && effectiveSearchQuery.startsWith('0x')) {
+                    effectiveSearchQuery = `${effectiveSearchQuery.substring(0, 4)}...${effectiveSearchQuery.slice(-4)}`;
+                }
+
+                filteredTransactions = transactions.filter(t => {
+                    const normalizedTransactionAddress = t.address.toLowerCase();
+                    return normalizedTransactionAddress.includes(effectiveSearchQuery);
+                });
+                
+                // When searching, update subtitle to reflect "Search Results"
+                document.getElementById('subtitleDate').textContent = `Search Results for "${searchQuery}" • Claims Alert Dashboard`;
+
+            } else {
+                // If no search query, filter by selected dates (original behavior)
+                filteredTransactions = transactions.filter(t => selectedDates.includes(t.date));
+                updateSubtitle(); // Revert subtitle to date display
+            }
+
+            currentTransactions = filteredTransactions;
             
             // Sort transactions by time
             currentTransactions.sort((a, b) => new Date(a.time) - new Date(b.time));
             
             // Update summary
             const totalAmount = currentTransactions.reduce((sum, t) => sum + t.amount, 0);
-			const totalClaimed = currentTransactions.reduce((sum, t) => sum + t.amount, 0);
-const claimsMade = currentTransactions.length;
-const largestClaim = currentTransactions.length > 0 ? Math.max(...currentTransactions.map(t => t.amount)) : 0;
-const averageClaim = claimsMade > 0 ? (totalClaimed / claimsMade) : 0;
+            const totalClaimed = currentTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const claimsMade = currentTransactions.length;
+            const largestClaim = currentTransactions.length > 0 ? Math.max(...currentTransactions.map(t => t.amount)) : 0;
+            const averageClaim = claimsMade > 0 ? (totalClaimed / claimsMade) : 0;
+
             document.getElementById('totalAmount').textContent = totalAmount.toLocaleString();
             document.getElementById('totalClaims').textContent = currentTransactions.length;
-			
-			document.querySelector('.stat-card:nth-child(1) .value').textContent = totalClaimed.toLocaleString() + ' USDT';
-document.querySelector('.stat-card:nth-child(2) .value').textContent = claimsMade;
-document.querySelector('.stat-card:nth-child(3) .value').textContent = largestClaim.toLocaleString();
-document.querySelector('.stat-card:nth-child(4) .value').textContent = averageClaim.toFixed(2);
+            
+            document.querySelector('.stat-card:nth-child(1) .value').textContent = totalClaimed.toLocaleString() + ' USDT';
+            document.querySelector('.stat-card:nth-child(2) .value').textContent = claimsMade;
+            document.querySelector('.stat-card:nth-child(3) .value').textContent = largestClaim.toLocaleString();
+            document.querySelector('.stat-card:nth-child(4) .value').textContent = averageClaim.toFixed(2);
             
             if (selectedDates.length === 1) {
                 const formattedDate = new Date(
-    selectedDates[0].split('/')[2],
-    selectedDates[0].split('/')[1]-1,
-    selectedDates[0].split('/')[0]
-).toLocaleDateString('en-GB', options).replace(/ /g, ' ');
-document.getElementById('selectedDate').textContent = formattedDate;
-updateSubtitle(formattedDate);
+                    selectedDates[0].split('/')[2],
+                    selectedDates[0].split('/')[1]-1,
+                    selectedDates[0].split('/')[0]
+                ).toLocaleDateString('en-GB', options).replace(/ /g, ' ');
+                document.getElementById('selectedDate').textContent = formattedDate;
+                if (!searchQuery) updateSubtitle(formattedDate);
             } else if (selectedDates.length > 1) {
                 const dateList = selectedDates.map(date => date.split('/')[0]).join(', ');
                 document.getElementById('selectedDate').textContent = `Dates: ${dateList}`;
-				updateSubtitle(`Dates: ${dateList}`);
+                if (!searchQuery) updateSubtitle(`Dates: ${dateList}`);
             } else {
                 document.getElementById('selectedDate').textContent = 'No dates selected';
-				updateSubtitle('No dates selected');
+                if (!searchQuery) updateSubtitle('No dates selected');
             }
             
             // Update chart
@@ -9726,32 +9810,23 @@ updateSubtitle(formattedDate);
         }
         
 		// --- NEW: Highlight today automatically ---
-const today = new Date();
-const options = { day: '2-digit', month: 'long', year: 'numeric' };
-function updateSubtitle() {
-    if (selectedDates.length === 0) {
-        // Show today’s full date
-        const todayFormatted = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-        document.getElementById('subtitleDate').textContent = `${todayFormatted} • Claims Alert Dashboard`;
-    } else if (selectedDates.length === 1) {
-        const dateNumber = selectedDates[0].split('/')[0].padStart(2, '0');
-        const monthYear = getMonthYear(selectedDates[0]);
-        document.getElementById('subtitleDate').textContent = `${dateNumber} ${monthYear} • Claims Alert Dashboard`;
-    } else {
-        const dateList = selectedDates.map(date => date.split('/')[0].padStart(2, '0')).join(', ');
-        // Use month/year from the first selected date (assume same month)
-        const monthYear = getMonthYear(selectedDates[0]);
-        document.getElementById('subtitleDate').textContent = `${dateList} ${monthYear} • Claims Alert Dashboard`;
-    }
-}
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        function updateSubtitle() {
+            if (selectedDates.length === 0) {
+                // Show general dashboard title if no dates selected
+                document.getElementById('subtitleDate').textContent = `Claims Alert Dashboard`;
+            } else if (selectedDates.length === 1) {
+                const dateNumber = selectedDates[0].split('/')[0].padStart(2, '0');
+                const monthYear = getMonthYear(selectedDates[0]);
+                document.getElementById('subtitleDate').textContent = `${dateNumber} ${monthYear} • Claims Alert Dashboard`;
+            } else {
+                const dateList = selectedDates.map(date => date.split('/')[0].padStart(2, '0')).join(', ');
+                // Use month/year from the first selected date (assume same month)
+                const monthYear = getMonthYear(selectedDates[0]);
+                document.getElementById('subtitleDate').textContent = `${dateList} ${monthYear} • Claims Alert Dashboard`;
+            }
+        }
 
-// Initialize subtitle with today's date
-updateSubtitle();
-const todayFormatted = today.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
-document.getElementById('subtitleDate').textContent = `${todayFormatted} • Claims Alert Dashboard`;
-const todayStr = `${today.getDate()}/${today.getMonth()+1}/${today.getFullYear()}`;
-selectedDates = [todayStr];
-updateDisplay();
 
         // Function to update transaction cards
         function updateTransactionCards() {
@@ -9760,19 +9835,19 @@ updateDisplay();
             existingCards.forEach(card => card.remove());
 			
 			// If no transactions, show "No one to claim"
-    if (currentTransactions.length === 0) {
-        const noDataCard = document.createElement('div');
-        noDataCard.className = 'transaction-card';
-        noDataCard.style.border = '2px solid #ffaa00';
-        noDataCard.style.background = 'rgba(255,255,255,0.05)';
-        noDataCard.style.color = '#ffaa00';
-        noDataCard.style.textAlign = 'center';
-        noDataCard.style.fontSize = '1rem';
-        noDataCard.style.padding = '20px';
-        noDataCard.textContent = 'No one to claim';
-        transactionsGrid.appendChild(noDataCard);
-        return;
-    }
+            if (currentTransactions.length === 0) {
+                const noDataCard = document.createElement('div');
+                noDataCard.className = 'transaction-card';
+                noDataCard.style.border = '2px solid #ffaa00';
+                noDataCard.style.background = 'rgba(255,255,255,0.05)';
+                noDataCard.style.color = '#ffaa00';
+                noDataCard.style.textAlign = 'center';
+                noDataCard.style.fontSize = '1rem';
+                noDataCard.style.padding = '20px';
+                noDataCard.textContent = 'No one to claim';
+                transactionsGrid.appendChild(noDataCard);
+                return;
+            }
             
             // Add new transaction cards
             currentTransactions.forEach((transaction, index) => {
@@ -9780,6 +9855,9 @@ updateDisplay();
                 card.className = `transaction-card ${transaction.amount >= 10000 ? 'large-transaction' : ''}`;
                 card.style.animationDelay = (index * 0.1) + 's';
                 
+                // Truncate wallet address for display
+                const displayAddress = `${transaction.address.substring(0, 6)}...${transaction.address.slice(-4)}`;
+
                 card.innerHTML = `
                     <div class="transaction-header">
                         <div class="transaction-time">⏰ ${transaction.time.split(' ')[1]}<br><span style="font-size: 0.8rem; opacity: 0.7;">${transaction.time.split(' ')[0]}</span></div>
@@ -9789,12 +9867,11 @@ updateDisplay();
                         </div>
                     </div>
                     <div style="font-size: 0.9rem; color: #00ccff; opacity: 0.8; margin-bottom: 10px;">
-                        <!-- Claim Alert #${transaction.index} -->
-						Claim Alert #
+                        Claim Alert #
                         ${transaction.amount >= 10000 ? ' • HIGH PRIORITY ALERT' : ' • STANDARD ALERT'}
                     </div>
                     <div style="font-size: 0.85rem; color: #ffaa00; opacity: 0.9; margin-bottom: 5px;">
-                        📱 Wallet Address: <span style="color: #00ff88; font-family: monospace;">${transaction.address}</span>
+                        📱 Wallet Address: <span style="color: #00ff88; font-family: monospace;">${displayAddress}</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #ffaa00; opacity: 0.9;">
                         📅 Smart Contact: <span style="color: #00ccff; font-weight: bold;">${transaction.contact} Days</span>
@@ -9822,24 +9899,40 @@ updateDisplay();
         updateDisplay();
     </script>
 	<script>
-  let currentMonth = new Date().getMonth();
-  let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
 
-  document.getElementById('monthSelect').value = currentMonth;
-  document.getElementById('yearSelect').value = currentYear;
+        document.getElementById('monthSelect').value = currentMonth;
+        document.getElementById('yearSelect').value = currentYear;
 
-  document.getElementById('monthSelect').addEventListener('change', updateCalendarFromDropdown);
-  document.getElementById('yearSelect').addEventListener('change', updateCalendarFromDropdown);
+        document.getElementById('monthSelect').addEventListener('change', updateCalendarFromDropdown);
+        document.getElementById('yearSelect').addEventListener('change', updateCalendarFromDropdown);
 
-  function updateCalendarFromDropdown() {
-    currentMonth = parseInt(document.getElementById('monthSelect').value);
-    currentYear = parseInt(document.getElementById('yearSelect').value);
-    updateDisplay();
-  }
+        function updateCalendarFromDropdown() {
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            updateDisplay();
+        }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    updateDisplay();
-  });
+        // Search functionality
+        const walletSearchInput = document.getElementById('walletSearch');
+        walletSearchInput.addEventListener('input', (event) => {
+            searchQuery = event.target.value.trim();
+            updateDisplay(); // Re-render the display with the new search query
+        });
+
+        // Clear Wallet Search Button functionality
+        const clearWalletSearchBtn = document.getElementById('clearWalletSearchBtn');
+        clearWalletSearchBtn.addEventListener('click', () => {
+            walletSearchInput.value = ''; // Clear the input field
+            searchQuery = ''; // Clear the search query variable
+            updateDisplay(); // Update the display
+        });
+
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDisplay();
+        });
 </script>
 </body>
 </html>
